@@ -30,11 +30,10 @@ export const AppContextProvider = ({ children }) => {
       if (responseData.success) {
         console.log(responseData.blog);
         setBlogs(responseData.blog);
-      } else {
-        toast.error(responseData.message);
       }
     } catch (error) {
-      AxiosToastError(error);
+      console.log("Error", error);
+      toast.error("Something went wrong");
     }
   };
 
