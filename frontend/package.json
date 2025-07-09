@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "tailwindcss": "^4.1.11",
+    "axios": "^1.10.0",
+    "@tailwindcss/vite": "^4.1.11",
     "marked": "^16.0.0",
     "moment": "^2.30.1",
     "motion": "^12.19.1",
