@@ -52,4 +52,8 @@ export const SummaryApi = {
     url: "/api/image/comment",
     method: "post",
   },
+  generate: {
+    url: "/api/image/gemini",
+    method: "post",
+  },
 };

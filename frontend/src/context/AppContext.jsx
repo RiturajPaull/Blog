@@ -22,7 +22,6 @@ export const AppContextProvider = ({ children }) => {
   const fetchBlogs = async () => {
     try {
       const response = await API({
-        // ...SummaryApi.allBlogs,
         ...SummaryApi.allBlogs,
       });
       console.log("All Blogs fetched", response);

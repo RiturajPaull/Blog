@@ -60,14 +60,11 @@ export const getAllComments = async (req, resp) => {
       .populate("blog")
       .sort({ createdAt: -1 });
 
-    return (
-      resp.status(200),
-      json({
-        message: "All coments",
-        success: true,
-        comment,
-      })
-    );
+    return resp.status(200).json({
+      message: "All coments",
+      success: true,
+      comment,
+    });
   } catch (error) {
     return resp.status(500).json({
       message: error.message || error,

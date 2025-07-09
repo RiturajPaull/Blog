@@ -1,9 +1,67 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { assets } from "../assets/assets";
+import { API } from "../axios/axios";
+import { SummaryApi } from "../api/SummaryAPI";
+import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
-const BlogTableItem = ({ blog, fetchDashboardData, index }) => {
-  const { title, createdAt, isPublished } = blog;
+const BlogTableItem = ({ blog, fetchBlogData, index }) => {
+  const { _id, title, createdAt, isPublished } = blog;
+  const { token } = useAppContext();
   const BlogDate = new Date(createdAt);
+
+  const unPublish = async () => {
+    try {
+      const response = await API({
+        ...SummaryApi.togglePublish,
+        data: {
+          id: _id,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("Response", response);
+      const { data: responseData } = response;
+      if (responseData.success) {
+        toast.success(responseData.message);
+        await fetchBlogData();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const deleteBlog = async () => {
+    const confirm = window.confirm(
+      "Are you sure you want to delete this blog?"
+    );
+    if (!confirm) return;
+    try {
+      const response = await API({
+        ...SummaryApi.deleteBlogsById,
+        data: {
+          id: _id,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("Blog Deleted");
+      const { data: responseData } = response;
+      if (responseData.success) {
+        toast.success(responseData.message);
+        await fetchBlogData();
+      } else {
+        toast.error(responseData.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // useEffect(() => {
+  //   fetchBlogData();
+  // });
 
   return (
     <tr className="border-b border-gray-300">
@@ -24,10 +82,14 @@ const BlogTableItem = ({ blog, fetchDashboardData, index }) => {
         </p>
       </td>
       <td className="px-5 flex items-center gap-4 justify-center pt-5">
-        <p className="border px-2 rounded text-sm cursor-pointer">
+        <p
+          onClick={unPublish}
+          className="border px-2 rounded text-sm cursor-pointer"
+        >
           {isPublished ? "Unpublish" : "Publish"}
         </p>
         <img
+          onClick={deleteBlog}
           src={assets.cross_icon}
           className="w-7 cursor-pointer hover:scale-105 border border-red-300 rounded-full hover:border-red-600 transition-all duration-300"
         />

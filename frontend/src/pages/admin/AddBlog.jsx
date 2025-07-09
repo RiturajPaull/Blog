@@ -1,26 +1,96 @@
 import React, { useEffect, useRef, useState } from "react";
 import { assets, blogCategories } from "../../assets/assets";
 import Quill from "quill";
+import { API } from "../../axios/axios";
+import { SummaryApi } from "../../api/SummaryAPI";
+import { useAppContext } from "../../context/AppContext";
+import toast from "react-hot-toast";
+import { parse } from "marked";
 const AddBlog = () => {
   const editorRef = useRef(null);
   const quillRef = useRef(null);
+  const { token } = useAppContext();
 
   const [image, setImage] = useState(false);
   const [title, setTitle] = useState("");
-  const [subTitle, setSubTitle] = useState("Startup");
-  const [category, setCategory] = useState("");
+  const [subTitle, setSubTitle] = useState("");
+  const [category, setCategory] = useState("Startup");
   const [isPublished, setIsPublished] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    try {
+      setIsAdding(true);
+      const blog = {
+        title,
+        subTitle,
+        description: quillRef.current.root.innerHTML,
+        isPublished,
+        category,
+      };
+      const formData = new FormData();
+      formData.append("blog", JSON.stringify(blog));
+      formData.append("image", image);
+      const response = await API({
+        ...SummaryApi.uploadBlog,
+        data: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("Uploaded Blog", response);
+      const { data: responseData } = response;
+      if (responseData.success) {
+        toast.success(responseData.message);
+        setImage(false);
+        setTitle("");
+        setSubTitle("");
+        setCategory("Startup");
+        setIsPublished(false);
+        quillRef.current.root.innerHTML = null;
+      } else {
+        toast.error(responseData.message);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsAdding(false);
+    }
   };
+
   useEffect(() => {
     // initialte quill only once
     if (!quillRef.current && editorRef.current) {
       quillRef.current = new Quill(editorRef.current, { theme: "snow" });
     }
   }, []);
-  const generateContent = async () => {};
+
+  const generateContent = async () => {
+    if (!title) return toast.error("Please enter the title");
+    try {
+      setLoading(true);
+      const response = await API({
+        ...SummaryApi.generate,
+        data: {
+          prompt: title,
+        },
+      });
+      console.log("AI response", response);
+      const { data: responseData } = response;
+      if (responseData.success) {
+        quillRef.current.root.innerHTML = parse(responseData.response);
+      } else {
+        toast.error(responseData.message);
+      }
+    } catch (error) {
+      toast.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <form
       onSubmit={onSubmit}
@@ -63,11 +133,12 @@ const AddBlog = () => {
         <div className="max-w-lg h-74 pb-16 sm:pb-10 pt-2 relative">
           <div ref={editorRef}></div>
           <button
+            disabled={loading}
             type="button"
             className="absolute bottom-1 right-2 ml-2 text-xs text-white bg-black/70 px-4 py-1.5 rounded hover:underline cursor-pointer"
             onClick={generateContent}
           >
-            Generate with AI
+            {loading ? "Generating...." : "Generate with AI"}
           </button>
         </div>
         <p className=" mt-4">Blog Category</p>
@@ -78,7 +149,7 @@ const AddBlog = () => {
         >
           <option>Select Category</option>
           {blogCategories.map((item, index) => (
-            <option key={index} value={category}>
+            <option key={index} value={item}>
               {item}
             </option>
           ))}
@@ -93,10 +164,11 @@ const AddBlog = () => {
           />
         </div>
         <button
+          disabled={isAdding}
           type="submit"
           className="block border mt-4 px-15 py-2 rounded text-lg bg-primary text-white"
         >
-          Add
+          {isAdding ? "Adding blog....." : "Add Blog"}
         </button>
       </div>
     </form>

@@ -9,6 +9,7 @@ import axios from "axios";
 
 import { API } from "../axios/axios";
 import { SummaryApi } from "../api/SummaryAPI";
+import toast from "react-hot-toast";
 const Blog = () => {
   const { id } = useParams();
   const [blogData, setBlogData] = useState(null);
@@ -65,6 +66,35 @@ const Blog = () => {
     fetchComments();
   }, []);
 
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await API({
+        ...SummaryApi.addComment,
+        data: {
+          blog: id,
+          name: data.name,
+          content: data.comment,
+        },
+      });
+      console.log("Response add Comment", response);
+      const { data: responseData } = response;
+      if (responseData.success) {
+        toast.success(responseData.message);
+        setData({
+          name: "",
+          comment: "",
+        });
+      } else {
+        toast.error(responseData.message);
+      }
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+  useEffect(() => {
+    fetchComments();
+  }, [data]);
   return blogData ? (
     <div className="relative">
       <Navbar />
@@ -117,7 +147,10 @@ const Blog = () => {
         {/* Comments Box */}
         <div className=" flex flex-col gap-5 mx-5 sm:mx-10 xl:mx-auto mt-26 mb-30">
           <p className="font-semibold text-lg">Add Your Comment</p>
-          <form className="flex flex-col items-start max-w-xl gap-8">
+          <form
+            onSubmit={handleAddComment}
+            className="flex flex-col items-start max-w-xl gap-8"
+          >
             <input
               name="name"
               value={data.name}

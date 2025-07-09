@@ -1,21 +1,28 @@
 import React, { useEffect, useState } from "react";
 import BlogTableItem from "../../components/BlogTableItem";
-import { dashboard_data } from "../../assets/assets";
-
+import { blog_data } from "../../assets/assets";
+import { API } from "../../axios/axios";
+import { SummaryApi } from "../../api/SummaryAPI";
 const ListBlog = () => {
-  const [dashboardData, setDashboardData] = useState({
-    blogs: 0,
-    comments: 0,
-    drafts: 0,
-    recentBlogs: [],
-  });
+  const [blogs, setBlogs] = useState([]);
 
-  const fetchDashData = () => {
-    setDashboardData(dashboard_data);
+  const fetchBlogData = async () => {
+    try {
+      const response = await API({
+        ...SummaryApi.adminAllBlogs,
+      });
+      // console.log("All Blogs", response);
+      const { data: responseData } = response;
+      if (responseData.success) {
+        setBlogs(responseData.blogs);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
-    fetchDashData();
+    fetchBlogData();
   }, []);
   return (
     <div className="w-full px-10 py-15">
@@ -49,11 +56,11 @@ const ListBlog = () => {
               </tr>
             </thead>
             <tbody>
-              {dashboardData.recentBlogs.map((blog, index) => (
+              {blogs.map((blog, index) => (
                 <BlogTableItem
                   blog={blog}
                   key={blog._id}
-                  fetchDashboardData={fetchDashData}
+                  fetchBlogData={fetchBlogData}
                   index={index + 1}
                 />
               ))}

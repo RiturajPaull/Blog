@@ -3,6 +3,7 @@ import {
   addBlog,
   addComment,
   deleteBlogById,
+  geminiAi,
   getAllBlogs,
   getBlogById,
   getIndividualBlogComment,
@@ -19,5 +20,5 @@ blogRouter.post("/delete", auth, deleteBlogById);
 blogRouter.post("/toggleStatus", auth, togglePublish);
 blogRouter.post("/add-comment", addComment);
 blogRouter.post("/comment", getIndividualBlogComment);
-
+blogRouter.post("/gemini", geminiAi);
 export default blogRouter;

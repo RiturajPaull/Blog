@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { assets, dashboard_data } from "../../assets/assets";
 import BlogTableItem from "../../components/BlogTableItem";
+import { API } from "../../axios/axios";
+import { SummaryApi } from "../../api/SummaryAPI";
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState({
@@ -11,7 +13,19 @@ const Dashboard = () => {
   });
 
   const fetchDashboardData = async () => {
-    setDashboardData(dashboard_data);
+    // setDashboardData(dashboard_data);
+    try {
+      const response = await API({
+        ...SummaryApi.adminGetDashData,
+      });
+      console.log("Dash data", response);
+      const { data: responseData } = response;
+      if (responseData.success) {
+        setDashboardData(responseData.dashboardData);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {

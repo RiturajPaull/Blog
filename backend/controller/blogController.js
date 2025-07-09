@@ -2,12 +2,18 @@ import imagekit from "../configs/imageKit.js";
 import BlogModel from "../model/BlogModel.js";
 import fs from "fs";
 import CommentModel from "../model/CommentModel.js";
+import main from "../configs/gemini.js";
 
 export const addBlog = async (req, resp) => {
   try {
     const { title, subTitle, description, category, isPublished } = JSON.parse(
       req.body.blog
     );
+    console.log(title);
+    console.log(subTitle);
+    console.log(description);
+    console.log(category);
+    console.log(isPublished);
 
     const imageFile = req.file; // multer middleware
     if (!title || !description || !category || !imageFile) {
@@ -192,6 +198,24 @@ export const getIndividualBlogComment = async (req, resp) => {
     });
   } catch (error) {
     return resp.status(200).json({
+      message: error.message || error,
+      success: false,
+    });
+  }
+};
+
+export const geminiAi = async (req, resp) => {
+  try {
+    const { prompt } = req.body;
+    const response = await main(
+      prompt + "Generate a blog content for this topic in simple text format"
+    );
+    return resp.send({
+      response,
+      success: true,
+    });
+  } catch (error) {
+    return resp.status(500).json({
       message: error.message || error,
       success: false,
     });
