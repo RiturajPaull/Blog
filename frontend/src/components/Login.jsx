@@ -57,7 +57,10 @@ const Login = () => {
         <div className=" w-full">
           <img
             src={assets.cross_icon}
-            onClick={() => setShowLoginPage(false)}
+            onClick={() => {
+              navigate("/");
+              console.log("Clicked");
+            }}
             className="cursor-pointer hover:scale-105 transition-all duration-500"
           />
         </div>

@@ -132,6 +132,12 @@ const AddBlog = () => {
         <p className="mt-4">Blog Description</p>
         <div className="max-w-lg h-74 pb-16 sm:pb-10 pt-2 relative">
           <div ref={editorRef}></div>
+          {loading && (
+            <div className="absolute top-12 border w-full h-[250px] bg-black/40 flex items-center justify-center">
+              <div className=" border-3 w-10 h-10 rounded-full animate-spin border-t-0"></div>
+            </div>
+          )}
+
           <button
             disabled={loading}
             type="button"
