@@ -12,10 +12,8 @@ import "quill/dist/quill.snow.css";
 import { Toaster } from "react-hot-toast";
 import { useAppContext } from "./context/AppContext";
 const App = () => {
-  const { token, fetchBlogs } = useAppContext();
-  useEffect(() => {
-    fetchBlogs();
-  });
+  const { token } = useAppContext();
+
   return (
     <div>
       <Routes>
