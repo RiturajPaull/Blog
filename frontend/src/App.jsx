@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Blog from "./pages/Blog";
@@ -12,7 +12,10 @@ import "quill/dist/quill.snow.css";
 import { Toaster } from "react-hot-toast";
 import { useAppContext } from "./context/AppContext";
 const App = () => {
-  const { token } = useAppContext();
+  const { token, fetchBlogs } = useAppContext();
+  useEffect(() => {
+    fetchBlogs();
+  });
   return (
     <div>
       <Routes>

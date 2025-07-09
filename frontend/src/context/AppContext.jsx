@@ -61,6 +61,7 @@ export const AppContextProvider = ({ children }) => {
     input,
     setInput,
     navigate,
+    fetchBlogs,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
